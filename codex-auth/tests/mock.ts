@@ -3,7 +3,7 @@ import type { NativeServices, NativePrompt } from '../src/controller.ts';
 export function mockServices() {
   let record: unknown;
   let running = false;
-  let fail = false;
+  let failure: unknown;
   let complete: (() => void) | undefined;
   let withdraw: (() => void) | undefined;
   let chosen: string | undefined;
@@ -17,7 +17,7 @@ export function mockServices() {
       begin: async ({ signal, interaction }) => {
         running = true;
         try {
-          if (fail) throw new Error('token error: secret-refresh-token secret-access-token');
+          if (failure) throw failure;
           chosen = await interaction.prompt({ kind: 'select', message: 'Login method', options: [{ id: 'browser', label: 'Browser' }, { id: 'device_code', label: 'Device code' }] });
           if (signal.aborted) return { status: 'cancelled' };
           const callback = new AbortController();
@@ -45,5 +45,5 @@ export function mockServices() {
       },
     },
   };
-  return { services, complete: () => complete?.(), withdraw: () => withdraw?.(), fail: () => { fail = true; }, chosen: () => chosen };
+  return { services, complete: () => complete?.(), withdraw: () => withdraw?.(), fail: (error?: unknown) => { failure = error ?? new Error('token error: secret-refresh-token secret-access-token'); }, chosen: () => chosen };
 }

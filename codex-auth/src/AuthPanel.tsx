@@ -103,7 +103,7 @@ export function AuthPanel() {
       {(error || attempt?.error) && <p role="alert" className="dca-error">{error || attempt?.error}</p>}
     </div>
     <div className="dca-help"><h3>选择哪种登录方式？</h3>
-      <p><strong>设备码登录：</strong>适合 WSL、远程主机及无桌面环境。打开授权网页并输入设备码后，这里会自动完成登录。需在 ChatGPT 安全设置或工作区权限中允许设备码登录。</p>
+      <p><strong>设备码登录：</strong>适合 WSL、远程主机及无桌面环境。打开授权网页并输入设备码后，这里会自动完成登录。能否使用取决于账号、工作区设置与网络地区；若不可用，请改用浏览器登录。</p>
       <p><strong>浏览器登录：</strong>通过本机回调完成；如果浏览器没有自动返回，可把跳转地址粘贴到上方提示框。</p>
       <p>关闭设置页后授权仍可继续；同一标签页重新打开会恢复进度。16 分钟未完成会自动取消。</p>
     </div>

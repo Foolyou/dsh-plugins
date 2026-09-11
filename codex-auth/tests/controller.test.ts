@@ -72,6 +72,23 @@ test('timeout/disposal cancels pending flow; upstream token error is redacted', 
     assert.equal(state.attempt?.status, 'failed'); assert.equal(JSON.stringify(state).includes('secret-'), false);
   } finally { await failedController.dispose(); }
 });
+test('classified failures reach the client without echoing upstream text', async () => {
+  const cases: [unknown, string][] = [
+    [new Error('OpenAI Codex token exchange failed (400): {"access_token":"secret-leak"}'), 'OpenAI 拒绝了令牌换取请求（授权码可能已过期或已使用），请重新发起登录。'],
+    [new Error('OpenAI Codex device code login is not enabled for this server. Use browser login or verify the server URL.'), '此账号或工作区未启用设备码登录，请改用浏览器登录。'],
+    [new Error('token error: secret-refresh-token'), '授权未完成。请重试，或改用另一种登录方式。'],
+  ];
+  for (const [error, expected] of cases) {
+    const failed = mockServices(); failed.fail(error); const controller = new AuthController(failed.services);
+    try {
+      await controller.act(owner, { action: 'start', mode: 'browser' }); await tick();
+      const state = await controller.state(owner);
+      assert.equal(state.attempt?.status, 'failed');
+      assert.equal(state.attempt?.error, expected);
+      assert.equal(JSON.stringify(state).includes('secret'), false);
+    } finally { await controller.dispose(); }
+  }
+});
 test('HTTP boundary validates ownership headers, content types, size, and actions', async () => {
   const mock = mockServices(); const controller = new AuthController(mock.services); const fetch = handler(controller);
   try {

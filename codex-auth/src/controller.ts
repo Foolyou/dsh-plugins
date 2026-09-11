@@ -23,13 +23,100 @@ interface Attempt {
   prompt: Prompt | null; error: string | null; abort: AbortController;
   answer?: (value: string) => void; done: Promise<void>; timer?: ReturnType<typeof setTimeout>;
 }
-const messageFor = (error: unknown) => {
-  const code = typeof error === 'object' && error !== null && 'code' in error ? error.code : undefined;
-  if (code === 'ALREADY_IN_FLIGHT') return '已有授权正在进行，请稍后重试。';
-  if (code === 'NO_FLOW') return 'Codex 授权服务尚未就绪。';
-  // Upstream token-exchange errors may contain token response bodies. Never
-  // return/log arbitrary exception messages from those flows to the client.
-  return '授权未完成。请重试；设备码登录需先在 ChatGPT 安全设置或工作区权限中启用。也可改用浏览器登录。';
+// Upstream authorization failures can embed token-response bodies in their
+// message: pi-ai appends the raw HTTP body to token errors, and pi-ai's
+// `ModelsError` folds its cause into its own message. `messageFor` therefore
+// never renders upstream text. It walks the thrown error's chain only to match
+// a whitelist of known signals, then returns a fixed sentence for that
+// category; anything unrecognized keeps the generic fallback. Token bodies
+// thus cannot reach the client through an error string.
+interface FailureFacts { codes: Set<string>; text: string }
+function failureFacts(error: unknown): FailureFacts {
+  const codes = new Set<string>();
+  const messages: string[] = [];
+  const seen = new Set<unknown>();
+  const queue: unknown[] = [error];
+  // Bounded walk: wrapper -> cause -> AggregateError members is all that occurs.
+  while (queue.length > 0 && seen.size < 32) {
+    const value = queue.shift();
+    if (value === null || value === undefined || seen.has(value)) continue;
+    if (typeof value === 'string') { messages.push(value); continue; }
+    if (typeof value !== 'object') continue;
+    if (Array.isArray(value)) { queue.push(...value.slice(0, 8)); continue; }
+    seen.add(value);
+    const record = value as Record<string, unknown>;
+    if (typeof record.code === 'string') codes.add(record.code.toLowerCase());
+    if (typeof record.name === 'string') codes.add(record.name.toLowerCase());
+    if (typeof record.message === 'string') messages.push(record.message);
+    if (typeof record.status === 'number') codes.add(String(record.status));
+    queue.push(record.cause, record.errors);
+  }
+  return { codes, text: messages.join('\n').toLowerCase() };
+}
+const mentions = (text: string, ...markers: string[]) => markers.some(marker => text.includes(marker));
+// Connection-level failures: Node system codes, undici codes, and TLS failures.
+const NETWORK_CODES = [
+  'enotfound', 'eai_again', 'eai_fail', 'eai_noname', 'econnrefused', 'econnreset', 'econnaborted',
+  'etimedout', 'esockettimedout', 'ehostunreach', 'enetunreach', 'enetdown', 'ehostdown', 'epipe', 'eproto',
+  'und_err_connect_timeout', 'und_err_socket', 'und_err_headers_timeout', 'und_err_body_timeout',
+  'err_socket_connection_timeout', 'cert_has_expired', 'unable_to_verify_leaf_signature',
+  'self_signed_cert_in_chain', 'depth_zero_self_signed_cert', 'err_tls_cert_altname_invalid',
+];
+// Ordered most specific first: a region-blocked token exchange is a 4xx too, so
+// the region signal must win over the generic exchange-failure rule.
+const FAILURE_RULES: readonly { test(facts: FailureFacts): boolean; message: string }[] = [
+  {
+    test: f => mentions(f.text, 'unsupported_country_region_territory', 'country, region, or territory not supported', 'not available in your country', 'not available in your region', 'region not supported', 'unsupported region'),
+    message: 'OpenAI 授权服务不支持当前网络所在地区，请更换网络或代理后重试。',
+  },
+  {
+    test: f => NETWORK_CODES.some(code => f.codes.has(code)) || mentions(f.text, 'fetch failed', 'getaddrinfo', 'socket hang up', 'network is unreachable', 'connection refused', 'connection reset'),
+    message: '无法连接 OpenAI 授权服务，请检查网络、DNS 与代理设置后重试。',
+  },
+  {
+    test: f => mentions(f.text, 'device code login is not enabled'),
+    message: '此账号或工作区未启用设备码登录，请改用浏览器登录。',
+  },
+  {
+    test: f => mentions(f.text, 'openai codex device code request failed', 'openai codex device auth failed', 'invalid openai codex device'),
+    message: '设备码请求未被 OpenAI 接受，请稍后重试或改用浏览器登录。',
+  },
+  {
+    test: f => /openai codex token (?:exchange|refresh) failed \(4\d\d\)/.test(f.text),
+    message: 'OpenAI 拒绝了令牌换取请求（授权码可能已过期或已使用），请重新发起登录。',
+  },
+  {
+    test: f => /openai codex token (?:exchange|refresh) failed \(5\d\d\)/.test(f.text),
+    message: 'OpenAI 令牌服务暂时不可用，请稍后重试。',
+  },
+  {
+    test: f => mentions(f.text, 'openai codex token exchange response missing fields', 'openai codex token refresh response missing fields', 'failed to extract accountid from token'),
+    message: 'OpenAI 返回的登录数据不完整，请重新登录。',
+  },
+  {
+    test: f => mentions(f.text, 'state mismatch', 'missing authorization code'),
+    message: '未收到有效的授权码，请重新发起登录，或粘贴完整的浏览器跳转地址。',
+  },
+  {
+    test: f => mentions(f.text, 'only available in node.js environments') || f.text.includes('unknown openai codex login method'),
+    message: '当前运行环境不支持此登录方式，请重启 DSH 后重试。',
+  },
+  {
+    test: f => f.codes.has('not_committed'),
+    message: '授权流程未写入凭据，请重试。',
+  },
+  {
+    test: f => f.codes.has('unknown_method'),
+    message: '此授权方式不受支持，请刷新页面后重试。',
+  },
+];
+const GENERIC_FAILURE = '授权未完成。请重试，或改用另一种登录方式。';
+export const messageFor = (error: unknown): string => {
+  const facts = failureFacts(error);
+  if (facts.codes.has('already_in_flight')) return '已有授权正在进行，请稍后重试。';
+  if (facts.codes.has('no_flow')) return 'Codex 授权服务尚未就绪。';
+  for (const rule of FAILURE_RULES) if (rule.test(facts)) return rule.message;
+  return GENERIC_FAILURE;
 };
 function publicNotice(notice: Notice): Notice {
   let url: string | undefined;
