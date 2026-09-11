@@ -2,7 +2,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, useSyncEx
 import { createPortal } from 'react-dom';
 import { NodeSlider, type SliderPartProps } from 'node-slider';
 import { activeChoice, effortChoices, selectEffort, selectModel, type Directory, type Selection } from './model';
-import { portraitIndex, usePortraits } from './portraits';
+import { portraitIndex, portraitStore, usePortraits } from './portraits';
 const palette = ['#258bd2', '#21bd60', '#e5ad26', '#e87930', '#cc282c'];
 function appearance(index: number, count: number, portraits: readonly string[]) {
   const progress = count <= 1 ? 0 : index / (count - 1);
@@ -19,6 +19,8 @@ export interface SelectorProps { directory: Directory; available: boolean; locke
 export function Selector({ directory, available, locked }: SelectorProps) {
   const state = useSyncExternalStore(fn => directory.store.subscribe(fn), () => directory.store.getSnapshot());
   const { portraits } = usePortraits();
+  const portraitUrls = useMemo(() => portraits.map(portrait => portrait.url), [portraits]);
+  const portraitKey = portraitUrls.join('\n');
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -31,9 +33,11 @@ export function Selector({ directory, available, locked }: SelectorProps) {
   const model = state.groups.find(g => g.id === state.current?.provider)?.models.find(m => m.id === state.current?.model);
   const choices = useMemo(() => effortChoices(model?.reasoning), [model?.reasoning]);
   const nodes = useMemo(() => choices.map((choice, i) => {
-    const look = appearance(i, choices.length, portraits);
+    const look = appearance(i, choices.length, portraitUrls);
     return { ...choice, color: look.color, data: { image: look.image } };
-  }), [choices, portraits]);
+  // `portraitKey` is the identity that matters: the store rebuilds the array on every publish.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [choices, portraitKey]);
   const active = activeChoice(state.current, model?.reasoning);
   const shown = nodes.find(n => n.id === preview) ?? nodes.find(n => n.id === active?.id);
   const name = model?.name ?? state.current?.model ?? '选择模型';
@@ -41,6 +45,9 @@ export function Selector({ directory, available, locked }: SelectorProps) {
   const close = () => { setOpen(false); setPreview(null); trigger.current?.focus(); };
   const load = () => { setError(null); void directory.load().catch(e => setError(String(e?.message ?? e))); };
   useEffect(() => { if (available) load(); }, [directory, available]);
+  // Opening the panel re-reads the host list, so a change made in another tab is
+  // visible immediately instead of waiting for the next poll tick.
+  useEffect(() => { if (open) void portraitStore.refresh(); }, [open]);
   useEffect(() => { setPreview(null); }, [state.current?.provider, state.current?.model, state.current?.reasoningEffort]);
   useEffect(() => { if (locked) setOpen(false); }, [locked]);
   useLayoutEffect(() => {

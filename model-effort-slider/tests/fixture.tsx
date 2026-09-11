@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { apply } from '../src/client';
+import { portraitStore } from '../src/portraits';
 import { useState } from 'react';
 import type { DirectoryState, Selection } from '../src/model';
 let state: DirectoryState = {
@@ -21,8 +22,8 @@ const directory = { store: { getSnapshot: () => state, subscribe: (fn: () => voi
     if (rejectNext) { rejectNext = false; throw new Error('Provider rejected effort'); }
     state = { ...state, current: selection }; listeners.forEach(fn => fn());
   } };
-Object.assign(window, { fixture: { calls, reject: () => { rejectNext = true; } } });
-// Exercise the production registration path, not a separately wired settings mock.
+// `store` exposes the real snapshot so specs can assert store state, not just DOM.
+Object.assign(window, { fixture: { calls, reject: () => { rejectNext = true; }, store: portraitStore } });// Exercise the production registration path, not a separately wired settings mock.
 const registrations = new Map<string, { options: any; Component: any }>();
 const disposers: (() => void)[] = [];
 apply({

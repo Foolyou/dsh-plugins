@@ -16,7 +16,9 @@ interface Context {
   };
 }
 export const name = 'model-effort-slider';
-export const inject = ['slots', 'sessions', 'modelDirectories', 'remote', 'remote.session'];
+// Host storage arrives over the plugin's own `/api` route through the browser
+// session cookie, so the browser half needs no `remote` service.
+export const inject = ['slots', 'sessions', 'modelDirectories'];
 export function apply(ctx: Context) {
   ctx.effect(() => {
     const style = document.createElement('style');

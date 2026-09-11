@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { uploadTestImage } from './image-helpers';
-test.beforeEach(async ({ page }) => { await page.goto('/'); await page.locator('.mes-trigger').click(); });
+import { isolate, uploadTestImage } from './image-helpers';
+isolate();
+test.beforeEach(async ({ page }) => { await page.locator('.mes-trigger').click(); });
 test('dragging the uploaded image edge preserves selection until movement and commits once', async ({ page }) => {
   await uploadTestImage(page);
   await page.emulateMedia({ reducedMotion: 'reduce' });

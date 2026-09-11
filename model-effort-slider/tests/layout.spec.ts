@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
-import { uploadTestImage } from './image-helpers';
+import { isolate, uploadTestImage } from './image-helpers';
+isolate();
 
 async function geometry(page: Page) {
   return page.locator('.mes-panel').evaluate(panel => {
@@ -13,7 +14,6 @@ async function geometry(page: Page) {
 for (const width of [375, 960]) {
   test(`image space adapts to upload, load failure and removal at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 812 });
-    await page.goto('/');
     await page.locator('.mes-trigger').click();
     await expect(page.locator('.mes-panel')).toBeVisible();
     const compact = await geometry(page);
