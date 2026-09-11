@@ -1,0 +1,7 @@
+node_modules/
+test-results/
+playwright-report/
+lib/*.tmp
+# Portraits are user-owned browser data, never bundled repository assets.
+assets/
+uploads/

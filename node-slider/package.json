@@ -1,0 +1,42 @@
+{
+  "name": "node-slider",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 15081",
+    "test": "node --test slider-math.test.js",
+    "build": "tsc && node scripts/build.mjs",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "test:browser": "playwright test",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "esbuild": "^0.28.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "typescript": "^7.0.2"
+  },
+  "version": "0.1.0",
+  "description": "Composable React node slider for DeepSeek Harness Web UI plugins",
+  "files": [
+    "dist",
+    "examples/harness-client.tsx"
+  ],
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./style.css": "./dist/node-slider.css"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0"
+  }
+}

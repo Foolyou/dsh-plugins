@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>节点式 Slider · 交互实验室</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><a class="brand" href="./"><span class="brand-mark">n</span> node<span class="brand-dot">.</span></a><span class="header-note">小组件，大体验 <span class="header-line"></span> INTERACTION LAB</span><a class="version" href="react.html">React 组件版 <span>↗</span></a></header>
+  <main>
+    <div class="eyebrow"><span></span> COMPONENT 001 <i>/</i> INPUT & CONTROL</div>
+    <h1>每一处停留，<br>都有自己的<span>色彩。</span></h1>
+    <p class="intro">一个有节点、有节奏的 Slider。<br>在不同状态之间，自然滑动，平滑过渡。</p>
+    <section class="playground" aria-label="节点式 Slider 演示">
+      <div class="card-top"><div><span class="tiny">PLAYGROUND</span><h2>找到你的节奏</h2></div><span class="live"><span></span> 实时交互</span></div>
+      <div class="selection"><span class="selection-icon">✳</span><div><span class="tiny">当前节点 <span id="number">03</span> / 05</span><div class="selection-name" id="name">专注</div></div><span class="color-value" id="color">#8674DF</span></div>
+      <div class="slider-wrap"><node-slider id="main-slider" aria-label="选择你的节奏"></node-slider></div>
+      <div class="card-bottom"><span><span class="mouse-icon">↔</span> 拖动控制头，或点击滑轨试试</span><button id="reset">重置 <span>↺</span></button></div>
+    </section>
+    <div class="features"><div><span class="feature-icon">◎</span><h3>精准落点</h3><p>区间点击归于前一节点<br>靠近下一节点，轻松激活</p></div><div><span class="feature-icon">◐</span><h3>色彩随行</h3><p>控制头与填充条同步移动<br>整段色彩，自然过渡</p></div><div><span class="feature-icon">⌁</span><h3>细腻反馈</h3><p>悬停小圆点，轻微放大<br>让每一次交互都有回应</p></div></div>
+    <section class="details" id="usage"><div><span class="tiny">MAKE IT YOURS</span><h2>节点由你定义</h2><p>每个节点，都可以拥有独立的名称与颜色。</p></div><div class="swatches" id="swatches"></div></section>
+    <footer><span>NODE SLIDER <span class="footer-divider">/</span> 为细节而设计</span><span>支持鼠标、触控与键盘 <span class="key">←</span> <span class="key">→</span></span></footer>
+  </main>
+  <script type="module" src="demo.js"></script>
+</body>
+</html>

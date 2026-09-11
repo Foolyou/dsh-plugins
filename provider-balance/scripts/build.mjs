@@ -1,0 +1,13 @@
+import { build } from 'esbuild';
+import { mkdir, writeFile, rename } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+process.chdir(resolve(dirname(fileURLToPath(import.meta.url)), '..'));
+await mkdir('lib', { recursive: true });
+const host = await build({ entryPoints: ['src/index.ts'], bundle: true, write: false, format: 'esm', platform: 'node', target: 'node22', packages: 'external' });
+const client = await build({ entryPoints: ['src/client.tsx'], bundle: true, write: false, format: 'cjs', platform: 'browser', target: 'es2022', jsx: 'automatic', external: ['react', 'react-dom', 'react/jsx-runtime'], loader: { '.css': 'text' } });
+await writeFile('lib/index.js.tmp', host.outputFiles[0].text);
+await rename('lib/index.js.tmp', 'lib/index.js');
+await writeFile('lib/client.js.tmp', `window.__ModuleLoader__.load({id:"dsh-provider-balance",factory:(require)=>{const module={exports:{}};const exports=module.exports;\n${client.outputFiles[0].text}\nreturn module.exports;}});\n`);
+await rename('lib/client.js.tmp', 'lib/client.js');
+console.log('Built provider balance host and client');

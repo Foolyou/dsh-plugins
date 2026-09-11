@@ -1,0 +1,20 @@
+.ns-root { --ns-background: #e9e7ee; --ns-surface: #fff; --ns-muted: #96929e; --ns-dot-color: #716a85; --ns-dot-passed: #fff; --ns-hover-scale: 1.8; display: block; min-width: 0; padding-inline: max(var(--ns-edge-inset), calc(var(--ns-thumb-size) / 2 + 4px)); }
+.ns-root *, .ns-root *::after { box-sizing: border-box; }
+.ns-control { position: relative; height: var(--ns-hit-height); outline: none; touch-action: pan-y; cursor: pointer; user-select: none; direction: ltr; }
+.ns-rail { position: absolute; top: 50%; transform: translateY(-50%); height: var(--ns-height); left: calc(-1 * var(--ns-edge-inset)); right: calc(-1 * var(--ns-edge-inset)); border-radius: var(--ns-radius); background: var(--ns-background); }
+.ns-fill { position: absolute; inset: 0 auto 0 0; width: calc(var(--ns-position) + var(--ns-fill-adjust)); border-radius: inherit; background: var(--ns-color); transition: width var(--ns-duration) var(--ns-easing), background-color var(--ns-duration) var(--ns-easing); }
+.ns-node { position: absolute; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; pointer-events: none; }
+.ns-default-node { display: block; width: 4px; height: 4px; border-radius: 50%; background: var(--ns-dot-color); opacity: .38; transition: transform 180ms ease, opacity 180ms ease; }
+.ns-node[data-passed] .ns-default-node { background: var(--ns-dot-passed); opacity: .65; }
+.ns-node[data-hovered] .ns-default-node { transform: scale(var(--ns-hover-scale)); opacity: .9; }
+.ns-thumb { position: absolute; top: 50%; left: var(--ns-position); width: var(--ns-thumb-size); height: var(--ns-thumb-size); transform: translate(-50%, -50%); display: grid; place-items: center; pointer-events: none; color: var(--ns-color); border-radius: 50%; transition: left var(--ns-duration) var(--ns-easing), color var(--ns-duration) var(--ns-easing); }
+.ns-default-thumb { display: block; width: 100%; height: 100%; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 4px var(--ns-surface), 0 3px 8px #29203a22; }
+.ns-control:focus-visible .ns-thumb { outline: 2px solid var(--ns-color); outline-offset: 6px; }
+.ns-labels { position: relative; height: 32px; margin-top: 9px; font-size: 12px; color: var(--ns-muted); }
+.ns-label { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.ns-label[data-selected] { color: var(--ns-color); font-weight: 600; }
+.ns-tooltip-anchor { position: relative; height: 0; top: calc(-1 * var(--ns-hit-height)); pointer-events: none; z-index: 10; }
+.ns-tooltip { position: absolute; bottom: 4px; width: max-content; max-width: min(100%, calc(100vw - 16px)); padding: 5px 8px; border: 1px solid var(--ns-tooltip-border, transparent); border-radius: 6px; background: var(--ns-tooltip-background, #292433); color: var(--ns-tooltip-color, #fff); font: 500 12px/1.4 system-ui, sans-serif; text-align: center; white-space: normal; overflow-wrap: anywhere; pointer-events: none; box-shadow: 0 2px 8px #0002; }
+.ns-root[data-disabled] { opacity: .5; }
+.ns-root[data-disabled] .ns-control { cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) { .ns-root *, .ns-root *::after { transition: none !important; } }

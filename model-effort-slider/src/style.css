@@ -1,0 +1,56 @@
+.mes-trigger,.mes-panel { font-family:inherit;box-sizing:border-box; }
+.mes-trigger { display:flex;align-items:center;gap:5px;min-width:0;max-width:min(360px,48cqw);height:28px;padding:0 8px;border:0;border-radius:20px;background:transparent;color:var(--dsw-alias-label-secondary,#747983);font-size:13px;cursor:pointer; }
+.mes-trigger:hover { background:var(--dsw-alias-interactive-bg-hover,#f1f2f4); }
+.mes-trigger-name { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.mes-trigger-effort { white-space:nowrap; }
+.mes-panel { --mes-bg:var(--dsw-specific-menu,#fff);position:fixed;z-index:1200;width:min(360px,calc(100vw - 24px));max-height:calc(100dvh - 24px);display:flex;flex-direction:column;background:var(--mes-bg);color:var(--dsw-alias-label-primary,#181a1f);border:1px solid var(--dsw-alias-border-l1,#dedee2);border-radius:17px;padding:14px 12px 8px;box-shadow:0 12px 40px #0000001a,0 2px 6px #00000008;outline:none; }
+.mes-panel * { box-sizing:border-box; }
+.mes-panel button { font:inherit;cursor:pointer; }
+.mes-panel button:disabled,.mes-trigger:disabled { cursor:default;opacity:.5; }
+.mes-panel button:focus-visible,.mes-trigger:focus-visible { outline:2px solid #459eee;outline-offset:2px; }
+.mes-heading { position:relative;text-align:center;flex-shrink:0;padding:0 30px; }
+.mes-level { font-size:17px;font-weight:650;line-height:23px;transition:color 260ms;overflow-wrap:anywhere; }
+.mes-model-name { font-size:14px;line-height:21px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.mes-reset { position:absolute;right:0;top:5px;background:transparent;border:0;color:var(--dsw-alias-label-caption,#898d96);font-size:24px!important;width:28px;height:30px;border-radius:6px; }
+.mes-reset:hover { background:var(--dsw-alias-interactive-bg-hover,#f2f3f5); }
+.mes-slider { --ns-background:var(--dsw-alias-interactive-bg-hover,#eceef1);--ns-surface:var(--mes-bg);--ns-dot-color:#a4a9b3;--ns-dot-passed:#fff;--ns-tooltip-background:var(--dsw-alias-bg-overlay,var(--mes-bg));--ns-tooltip-color:var(--dsw-alias-label-primary,#181a1f);--ns-tooltip-border:var(--dsw-alias-border-l1,#dedee2);flex-shrink:0;margin:8px 1px 8px; }
+/* Image layout belongs to this plugin; reserve space only for a rendered image. */
+.mes-slider:has(.mes-thumb[data-image]) { margin-top:max(8px,calc(var(--ns-thumb-size) + 22px - var(--ns-hit-height) / 2)); }
+.mes-slider:not(:has(.mes-thumb[data-image])) .ns-thumb { display:none; }
+.mes-slider:not(:has(.mes-thumb[data-image])) .ns-control:focus-visible .ns-rail { outline:2px solid var(--ns-color);outline-offset:3px; }
+.mes-slider .ns-thumb { transform:translate(-50%,calc(-100% - 16px));border-radius:9px;pointer-events:auto;touch-action:none;cursor:grab; }
+.mes-slider[data-dragging] .ns-thumb { cursor:grabbing; }
+.mes-slider[data-disabled] .ns-thumb { cursor:not-allowed; }
+.mes-slider .ns-default-node { width:6px;height:6px;opacity:.85; }
+.mes-slider .ns-fill { min-width:calc(var(--ns-edge-inset) + var(--ns-radius)); }
+.mes-slider .ns-node[data-selected] .ns-default-node { background:var(--ns-dot-passed); }
+/* The image is the optional drag target; without it, the track remains interactive. */
+.mes-thumb { display:block;position:relative;width:100%;height:100%;border:2px solid transparent;border-radius:9px;background:transparent;box-shadow:none; }
+.mes-thumb[data-image] { border-color:currentColor;background:currentColor;box-shadow:0 3px 13px #0003; }
+.mes-thumb img { width:100%;height:100%;object-fit:cover;display:block;border-radius:6px; }
+.mes-list { border-top:1px solid var(--dsw-alias-border-l1,#eee);overflow:auto;min-height:0;padding-top:4px;max-height:380px;overscroll-behavior:contain;scrollbar-width:thin; }
+.mes-group { color:var(--dsw-alias-label-caption,#9ca2ad);padding:10px 10px 5px;font-size:13px; }
+.mes-option { display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:40px;padding:9px 10px;text-align:left;color:inherit;border:0;border-radius:8px;background:transparent;font-size:15px!important; }
+.mes-option>span:first-child { overflow-wrap:anywhere; }
+.mes-option>span:last-child { flex-shrink:0;width:17px;font-size:19px; }
+.mes-option:hover:not(:disabled) { background:var(--dsw-alias-interactive-bg-hover,#f3f4f6); }
+.mes-hint { padding:14px 10px;color:var(--dsw-alias-label-caption,#858a94);font-size:12px; }
+.mes-error { padding:10px;color:#d85353;font-size:12px;overflow-wrap:anywhere; }
+.mes-error button { display:block;margin-top:6px;color:inherit;background:transparent;border:1px solid currentColor;border-radius:5px; }
+.mes-footnote { font-size:10px;color:var(--dsw-alias-label-caption,#969ba5);text-align:center;padding:7px 0 0; }
+.mes-effort-fallback { display:flex;flex-wrap:wrap;gap:6px;padding:8px; }
+.mes-effort-fallback button { background:transparent;color:inherit;border:1px solid var(--dsw-alias-border-l1,#ddd);border-radius:6px; }
+.mes-settings { font:inherit;color:var(--dsw-alias-label-primary,#181a1f);max-width:720px;padding:12px;overflow-wrap:anywhere; }
+.mes-settings h2 { font-size:18px;margin:0 0 12px; }
+.mes-settings p { font-size:13px;line-height:1.7; }
+.mes-settings label { display:block;font-weight:600;margin:16px 0 8px; }
+.mes-settings input { display:block;max-width:100%;font:inherit;margin-bottom:16px; }
+.mes-settings button { font:inherit;border:1px solid var(--dsw-alias-border-l1,#aaa);border-radius:6px;padding:7px 10px;min-height:36px;background:var(--dsw-specific-menu,#fff);color:inherit;cursor:pointer; }
+.mes-settings button:disabled { opacity:.5;cursor:default; }
+.mes-settings button:focus-visible,.mes-settings input:focus-visible { outline:2px solid #459eee;outline-offset:3px; }
+.mes-portraits { display:flex;flex-wrap:wrap;gap:12px;list-style:none;padding:0;margin:16px 0; }
+.mes-portraits li { display:flex;align-items:center;flex-direction:column;gap:8px;padding:10px;border:1px solid var(--dsw-alias-border-l1,#ddd);border-radius:8px; }
+.mes-portraits img { width:72px;height:72px;object-fit:cover;border-radius:6px; }
+.mes-portrait-actions { display:flex;gap:4px; }
+.mes-settings-empty { color:var(--dsw-alias-label-secondary,#747983); }
+@media(prefers-reduced-motion:reduce) { .mes-panel * { transition:none!important; } }

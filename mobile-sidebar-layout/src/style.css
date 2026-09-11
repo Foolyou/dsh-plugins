@@ -1,0 +1,39 @@
+/* Independent layout fork. Desktop rules derived from DeepSeek's MIT AppFrame. */
+.msl-frame {
+  background: var(--dsw-alias-bg-base); height: 100%;
+  transition: grid-template-columns var(--ds-transition-duration-slow) var(--ds-ease-in-out);
+  grid-template-rows: 100%; display: grid; position: relative; overflow: hidden;
+}
+.msl-sidebar { grid-column: 1; grid-row: 1; background: var(--dsw-specific-sidebar-fill); border-right: .5px solid var(--dsw-alias-border-l3); min-width: 0; overflow: hidden; }
+.msl-center { grid-column: 2; grid-row: 1; flex-direction: column; min-width: 0; display: flex; overflow: hidden; }
+.msl-rightbar { grid-column: 3; grid-row: 1; min-width: 0; position: relative; overflow: visible; }
+.msl-handle { cursor: col-resize; z-index: 11; touch-action: none; width: 8px; transition: left var(--ds-transition-duration-slow) var(--ds-ease-in-out); margin-left: -4px; position: absolute; top: 0; bottom: 0; }
+.msl-frame[data-dragging], .msl-frame[data-dragging] .msl-handle,
+.msl-frame[data-rightbar-fullscreen], .msl-frame[data-rightbar-fullscreen] .msl-handle,
+.msl-frame[data-rightbar-instant], .msl-frame[data-rightbar-instant] .msl-handle { transition: none; }
+.msl-overlay { z-index: 20; pointer-events: none; position: absolute; inset: 0; }
+.msl-overlay > * { pointer-events: auto; }
+/* Drawer (15) and backdrop (14) stay below official shell overlays (20).
+   Do not create a stacking context on the frame: native body portals remain higher. */
+.msl-frame[data-mobile] { transition: none; }
+.msl-frame[data-mobile] > .msl-center { min-height: 0; }
+.msl-frame[data-mobile] > .msl-sidebar {
+  position: absolute; inset: 0 auto 0 0; width: var(--msl-drawer-width);
+  box-sizing: border-box; z-index: 15; visibility: hidden; pointer-events: none;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+}
+.msl-frame[data-drawer-open] > .msl-sidebar { visibility: visible; pointer-events: auto; box-shadow: 8px 0 32px #0003; }
+.msl-backdrop { position: absolute; inset: 0; background: #0006; z-index: 14; touch-action: none; }
+.msl-trigger {
+  position: absolute; top: calc(88px + env(safe-area-inset-top, 0px));
+  left: env(safe-area-inset-left, 0px); z-index: 12;
+  width: 24px; height: 44px; border-radius: 0 8px 8px 0; box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  color: var(--dsw-alias-label-primary); background: var(--dsw-specific-sidebar-fill);
+  border: 1px solid var(--dsw-alias-border-l3); border-left: 0; box-shadow: 2px 1px 6px #0002;
+  padding: 0; touch-action: manipulation;
+}
+.msl-trigger[hidden] { display: none; }
+.msl-trigger:focus-visible, .msl-sidebar:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
+@media (prefers-reduced-motion: reduce) { .msl-frame, .msl-handle { transition: none; } }
