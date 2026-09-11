@@ -1,0 +1,24 @@
+{
+  "name": "dsh-plugins-bundle",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Official DSH profile bundle for the dsh-plugins collection",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": ["cordis.patch.yml", "lib/mobile-sidebar-layout", "README.md"],
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "dsh-model-effort-slider": "file:../model-effort-slider",
+    "dsh-codex-auth": "file:../codex-auth",
+    "dsh-provider-balance": "file:../provider-balance",
+    "dsh-device-code-login": "file:../device-code-login"
+  }
+}

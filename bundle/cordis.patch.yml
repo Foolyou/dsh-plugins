@@ -1,0 +1,23 @@
+# Official Bundle patch, layered AFTER dsh-base and dsh-web-app.
+# Stable IDs let a user's later profile patch disable/configure each feature.
+- insert:
+    - id: ui-model-effort-slider
+      name: dsh-model-effort-slider
+    - id: authorization
+      name: '@deepseek-ai/dsh-authorization'
+    - id: codex-auth
+      name: dsh-codex-auth
+    - id: provider-balance
+      name: dsh-provider-balance
+
+    # The fork retains the official module identity. Enable only while disabling
+    # ui-layout. DSH anchors this filesystem entry beside THIS patch file.
+    - id: ui-mobile-sidebar-layout
+      name: ./lib/mobile-sidebar-layout/lib/index.js
+      disabled: true
+
+    # Never change browser authentication merely by installing/updating a bundle.
+    # Enabling requires explicit origins/frontendIndex in the user's own patch.
+    - id: device-code-login
+      name: dsh-device-code-login
+      disabled: true
